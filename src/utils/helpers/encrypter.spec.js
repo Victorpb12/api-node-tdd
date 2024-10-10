@@ -20,4 +20,11 @@ describe("Encryper", () => {
     const isValid = await sut.compare("value", "hash");
     expect(isValid).toBe(false);
   });
+
+  test("Should call bcrypt with correct values", async () => {
+    const sut = new Encrypter();
+    await sut.compare("value", "hash");
+    expect(bcrypt.value).toBe("any_value");
+    expect(bcrypt.hash).toBe("hashed_value");
+  });
 });
