@@ -1,6 +1,8 @@
 const MissingParamError = require("../../utils/errors/missingParamError");
 const { MongoClient } = require("mongodb");
 
+let client, db;
+
 class LoadUSerByEmailRepository {
   constructor(userModel) {
     this.userModel = userModel;
@@ -12,11 +14,12 @@ class LoadUSerByEmailRepository {
 }
 
 const makeSut = () => {
-  return new LoadUSerByEmailRepository();
+  const userModel = db.collection("users");
+  const sut = new LoadUSerByEmailRepository(userModel);
+  return { userModel, sut };
 };
 
 describe("LoadUSerByEmail Repository", () => {
-  let client, db;
   beforeAll(async () => {
     client = await MongoClient.connect(process.env.MONGO_URL);
     db = client.db();
@@ -31,16 +34,14 @@ describe("LoadUSerByEmail Repository", () => {
   });
 
   test("Should return null if no user is found", async () => {
-    const userModel = db.collection("users");
-    const sut = new LoadUSerByEmailRepository(userModel);
+    const { sut } = makeSut();
     const user = await sut.load("invalid_email@gmail.com");
     expect(user).toBeNull();
   });
 
   test("Should return an user is found", async () => {
-    const userModel = db.collection("users");
+    const { sut, userModel } = makeSut();
     await userModel.insertOne({ email: "valid_email@gmail.com" });
-    const sut = new LoadUSerByEmailRepository(userModel);
     const user = await sut.load("valid_email@gmail.com");
     expect(user.email).toBe("valid_email@gmail.com");
   });
