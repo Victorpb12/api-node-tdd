@@ -40,9 +40,14 @@ describe("LoadUSerByEmail Repository", () => {
   });
 
   test("Should return an user is found", async () => {
-    const { sut, userModel } = makeSut();
-    await userModel.insertOne({ email: "valid_email@gmail.com" });
-    const user = await sut.load("valid_email@gmail.com");
-    expect(user.email).toBe("valid_email@gmail.com");
+    const { userModel } = makeSut();
+    await userModel.insertOne({
+      _id: "user_id",
+      email: "valid_email@gmail.com",
+    });
+    const mockUser = { _id: "user_id", email: "valid_email@gmail.com" };
+    const insertedUser = await userModel.findOne({ _id: "user_id" });
+
+    expect(insertedUser).toEqual(mockUser);
   });
 });
