@@ -40,4 +40,10 @@ describe("LoadUSerByEmail Repository", () => {
 
     expect(insertedUser).toEqual(mockUser);
   });
+
+  test("Should throw if no userModel is provided", async () => {
+    const sut = new LoadUSerByEmailRepository();
+    const promise = sut.load("any_email@gmail.com");
+    expect(promise).rejects.toThrow();
+  });
 });
